@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 400px;
+            margin: 100px auto;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 20px;
+            height: calc(100vh - 140px);
+        }
+
+        .dashboard.hidden {
+            display: none;
+        }
+
+        .sidebar {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px 15px;
+            text-decoration: none;
+            color: #555;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .sidebar a:hover, .sidebar a.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .table th, .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-enrolled {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-completed {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .alert {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Section -->
+    <div id="loginSection" class="login-container">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #667eea;">Learning Management System</h2>
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Enter your username">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter your password">
+        </div>
+        <button class="btn" style="width: 100%;" onclick="login()">Login</button>
+        <div id="loginAlert" style="margin-top: 15px;"></div>
+    </div>
+
+    <!-- Dashboard Section -->
+    <div id="dashboardSection" class="hidden">
+        <div class="container">
+            <div class="header">
+                <div class="logo">LMS Dashboard</div>
+                <div class="user-info">
+                    <span id="welcomeText">Welcome, User</span>
+                    <button class="btn btn-secondary" onclick="logout()">Logout</button>
+                </div>
+            </div>
+
+            <div class="dashboard">
+                <div class="sidebar">
+                    <ul id="sidebarMenu">
+                        <!-- Menu items will be populated dynamically -->
+                    </ul>
+                </div>
+
+                <div class="main-content">
+                    <!-- Dashboard Overview -->
+                    <div id="overviewContent">
+                        <h2>Dashboard Overview</h2>
+                        <div id="debugInfo" style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px; font-size: 12px; color: #666;">
+                            <strong>Debug Info:</strong> User: <span id="debugUser">-</span> | Role: <span id="debugRole">-</span> | Status: <span id="debugStatus">Ready</span>
+                        </div>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-number" id="totalStudents">0</div>
+                                <div class="stat-label">Total Students</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="totalCourses">0</div>
+                                <div class="stat-label">Total Courses</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="totalEnrollments">0</div>
+                                <div class="stat-label">Total Enrollments</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="totalAssignments">0</div>
+                                <div class="stat-label">Total Assignments</div>
+                            </div>
+                        </div>
+                        <div id="recentActivity">
+                            <h3>Recent Activity</h3>
+                            <div id="activityList" class="card">
+                                <div class="activity-item" style="padding: 10px; border-bottom: 1px solid #eee;">
+                                    <p><strong>System Ready</strong> - LMS is operational and ready to use</p>
+                                    <small style="color: #666;">Just now</small>
+                                </div>
+                                <div class="activity-item" style="padding: 10px;">
+                                    <p><strong>Welcome!</strong> - Start by exploring the sidebar menu</p>
+                                    <small style="color: #666;">Getting started</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Students Management -->
+                    <div id="studentsContent" class="hidden">
+                        <div class="card-header">
+                            <h2>Students Management</h2>
+                            <button class="btn" onclick="showAddStudentModal()">Add Student</button>
+                        </div>
+                        <div id="studentsTable">
+                            <div class="loading">Loading students...</div>
+                        </div>
+                    </div>
+
+                    <!-- Courses Management -->
+                    <div id="coursesContent" class="hidden">
+                        <div class="card-header">
+                            <h2>Courses Management</h2>
+                            <button class="btn" onclick="showAddCourseModal()">Add Course</button>
+                        </div>
+                        <div id="coursesTable">
+                            <div class="loading">Loading courses...</div>
+                        </div>
+                    </div>
+
+                    <!-- Enrollments Management -->
+                    <div id="enrollmentsContent" class="hidden">
+                        <div class="card-header">
+                            <h2>Enrollments Management</h2>
+                            <button class="btn" onclick="showEnrollStudentModal()">Enroll Student</button>
+                        </div>
+                        <div id="enrollmentsTable">
+                            <div class="loading">Loading enrollments...</div>
+                        </div>
+                    </div>
+
+                    <!-- Assignments Management -->
+                    <div id="assignmentsContent" class="hidden">
+                        <div class="card-header">
+                            <h2>Assignments Management</h2>
+                            <button class="btn" onclick="showAddAssignmentModal()">Add Assignment</button>
+                        </div>
+                        <div id="assignmentsTable">
+                            <div class="loading">Loading assignments...</div>
+                        </div>
+                    </div>
+
+                    <!-- Submissions Management -->
+                    <div id="submissionsContent" class="hidden">
+                        <div class="card-header">
+                            <h2>Submissions Management</h2>
+                        </div>
+                        <div id="submissionsTable">
+                            <div class="loading">Loading submissions...</div>
+                        </div>
+                    </div>
+
+                    <!-- My Courses (Student View) -->
+                    <div id="myCoursesContent" class="hidden">
+                        <h2>My Courses</h2>
+                        <div id="myCoursesGrid">
+                            <div class="loading">Loading your courses...</div>
+                        </div>
+                    </div>
+
+                    <!-- My Assignments (Student View) -->
+                    <div id="myAssignmentsContent" class="hidden">
+                        <h2>My Assignments</h2>
+                        <div id="myAssignmentsTable">
+                            <div class="loading">Loading your assignments...</div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Tracking -->
+                    <div id="progressContent" class="hidden">
+                        <h2>Progress Tracking</h2>
+                        <div id="progressData">
+                            <div class="loading">Loading progress data...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Add Student Modal -->
+    <div id="addStudentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addStudentModal')">&times;</span>
+            <h3>Add New Student</h3>
+            <form id="addStudentForm">
+                <div class="form-group">
+                    <label for="studentName">Name</label>
+                    <input type="text" id="studentName" required>
+                </div>
+                <div class="form-group">
+                    <label for="studentUsername">Username</label>
+                    <input type="text" id="studentUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="studentPassword">Password</label>
+                    <input type="password" id="studentPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="studentDepartment">Department</label>
+                    <input type="text" id="studentDepartment" required>
+                </div>
+                <button type="submit" class="btn">Add Student</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Course Modal -->
+    <div id="addCourseModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addCourseModal')">&times;</span>
+            <h3>Add New Course</h3>
+            <form id="addCourseForm">
+                <div class="form-group">
+                    <label for="courseName">Course Name</label>
+                    <input type="text" id="courseName" required>
+                </div>
+                <div class="form-group">
+                    <label for="courseDescription">Description</label>
+                    <textarea id="courseDescription" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn">Add Course</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Enroll Student Modal -->
+    <div id="enrollStudentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('enrollStudentModal')">&times;</span>
+            <h3>Enroll Student in Course</h3>
+            <form id="enrollStudentForm">
+                <div class="form-group">
+                    <label for="enrollStudentSelect">Select Student</label>
+                    <select id="enrollStudentSelect" required>
+                        <option value="">Select a student...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="enrollCourseSelect">Select Course</label>
+                    <select id="enrollCourseSelect" required>
+                        <option value="">Select a course...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="enrollmentStatus">Status</label>
+                    <select id="enrollmentStatus" required>
+                        <option value="Enrolled">Enrolled</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Dropped">Dropped</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn">Enroll Student</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Assignment Modal -->
+    <div id="addAssignmentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addAssignmentModal')">&times;</span>
+            <h3>Add New Assignment</h3>
+            <form id="addAssignmentForm">
+                <div class="form-group">
+                    <label for="assignmentCourse">Select Course</label>
+                    <select id="assignmentCourse" required>
+                        <option value="">Select a course...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="assignmentTitle">Title</label>
+                    <input type="text" id="assignmentTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="assignmentDescription">Description</label>
+                    <textarea id="assignmentDescription" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="assignmentDueDate">Due Date</label>
+                    <input type="datetime-local" id="assignmentDueDate" required>
+                </div>
+                <button type="submit" class="btn">Add Assignment</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Submit Assignment Modal -->
+    <div id="submitAssignmentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('submitAssignmentModal')">&times;</span>
+            <h3>Submit Assignment</h3>
+            <form id="submitAssignmentForm">
+                <div id="assignmentDetails"></div>
+                <div class="form-group">
+                    <label for="submissionFile">Upload Submission (optional)</label>
+                    <input type="file" id="submissionFile">
+                </div>
+                <div class="form-group">
+                    <label for="submissionText">Submission Text</label>
+                    <textarea id="submissionText" rows="6" placeholder="Enter your submission here..." required></textarea>
+                </div>
+                <button type="submit" class="btn">Submit Assignment</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let userRole = null;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is already logged in
+            const savedUser = localStorage.getItem('lmsUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                userRole = currentUser.role || 'student';
+                showDashboard();
+            }
+        });
+
+        // Authentication Functions
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                showAlert('loginAlert', 'Please enter both username and password', 'error');
+                return;
+            }
+
+            showAlert('loginAlert', 'Logging in...', 'info');
+            
+            // Check if Google Apps Script is available
+            if (typeof google === 'undefined' || !google.script) {
+                console.warn('Google Apps Script not available - using demo login');
+                // Demo login for testing
+                if (username === 'admin' && password === 'admin') {
+                    onLoginSuccess({
+                        success: true,
+                        user: {
+                            id: 0,
+                            name: 'Administrator',
+                            username: 'admin',
+                            department: 'Administration',
+                            role: 'admin'
+                        }
+                    });
+                } else if (username === 'student' && password === 'student') {
+                    onLoginSuccess({
+                        success: true,
+                        user: {
+                            id: 1,
+                            name: 'Demo Student',
+                            username: 'student',
+                            department: 'Computer Science',
+                            role: 'student'
+                        }
+                    });
+                } else {
+                    showAlert('loginAlert', 'Demo mode: Use admin/admin or student/student', 'error');
+                }
+                return;
+            }
+            
+            google.script.run
+                .withSuccessHandler(onLoginSuccess)
+                .withFailureHandler(onLoginFailure)
+                .authenticateUser(username, password);
+        }
+
+        function onLoginSuccess(result) {
+            console.log('Login result:', result);
+            
+            if (result && result.success) {
+                currentUser = result.user;
+                userRole = result.user.role || 'student';
+                localStorage.setItem('lmsUser', JSON.stringify(currentUser));
+                console.log('Login successful, user role:', userRole);
+                showDashboard();
+            } else {
+                showAlert('loginAlert', result.message || 'Invalid credentials', 'error');
+            }
+        }
+
+        function onLoginFailure(error) {
+            showAlert('loginAlert', 'Login failed: ' + error, 'error');
+        }
+
+        function logout() {
+            currentUser = null;
+            userRole = null;
+            localStorage.removeItem('lmsUser');
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('dashboardSection').classList.add('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        function showDashboard() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('dashboardSection').classList.remove('hidden');
+            document.getElementById('welcomeText').textContent = `Welcome, ${currentUser.name}`;
+            
+            // Small delay to ensure DOM is ready
+            setTimeout(() => {
+                setupSidebar();
+                showContent('overview');
+                loadDashboardData();
+                
+                // Update debug info
+                if (document.getElementById('debugUser')) {
+                    document.getElementById('debugUser').textContent = currentUser.name;
+                    document.getElementById('debugRole').textContent = userRole;
+                    document.getElementById('debugStatus').textContent = 'Dashboard Loaded';
+                }
+            }, 100);
+        }
+
+        function setupSidebar() {
+            const sidebar = document.getElementById('sidebarMenu');
+            if (!sidebar) {
+                console.error('Sidebar menu element not found');
+                return;
+            }
+            
+            let menuItems = [];
+
+            if (userRole === 'admin') {
+                menuItems = [
+                    { id: 'overview', label: 'Dashboard', icon: '📊' },
+                    { id: 'students', label: 'Students', icon: '👥' },
+                    { id: 'courses', label: 'Courses', icon: '📚' },
+                    { id: 'enrollments', label: 'Enrollments', icon: '📝' },
+                    { id: 'assignments', label: 'Assignments', icon: '📋' },
+                    { id: 'submissions', label: 'Submissions', icon: '📄' },
+                    { id: 'progress', label: 'Progress', icon: '📈' }
+                ];
+            } else {
+                menuItems = [
+                    { id: 'overview', label: 'Dashboard', icon: '📊' },
+                    { id: 'myCourses', label: 'My Courses', icon: '📚' },
+                    { id: 'myAssignments', label: 'My Assignments', icon: '📋' },
+                    { id: 'progress', label: 'My Progress', icon: '📈' }
+                ];
+            }
+
+            sidebar.innerHTML = menuItems.map(item => 
+                `<li><a href="#" onclick="showContent('${item.id}')" id="menu-${item.id}">
+                    <span style="margin-right: 10px;">${item.icon}</span>${item.label}
+                </a></li>`
+            ).join('');
+            
+            console.log('Sidebar setup complete with', menuItems.length, 'items');
+        }
+
+        function showContent(contentId) {
+            console.log('Showing content:', contentId);
+            
+            // Hide all content sections
+            const contents = ['overview', 'students', 'courses', 'enrollments', 'assignments', 'submissions', 'myCourses', 'myAssignments', 'progress'];
+            contents.forEach(id => {
+                const element = document.getElementById(id + 'Content');
+                if (element) {
+                    element.classList.add('hidden');
+                }
+            });
+
+            // Remove active class from all menu items
+            document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+
+            // Show selected content and mark menu item as active
+            const selectedContent = document.getElementById(contentId + 'Content');
+            const selectedMenu = document.getElementById('menu-' + contentId);
+            
+            console.log('Selected content element:', selectedContent);
+            console.log('Selected menu element:', selectedMenu);
+            
+            if (selectedContent) {
+                selectedContent.classList.remove('hidden');
+                if (selectedMenu) selectedMenu.classList.add('active');
+                
+                // Load specific content data
+                loadContentData(contentId);
+            } else {
+                console.error('Content element not found:', contentId + 'Content');
+            }
+        }
+
+        function loadDashboardData() {
+            // Check if Google Apps Script is available
+            if (typeof google === 'undefined' || !google.script) {
+                console.warn('Google Apps Script not available - using demo data');
+                updateDashboardStats({
+                    students: 5,
+                    courses: 3,
+                    enrollments: 8,
+                    assignments: 12
+                });
+                return;
+            }
+            
+            google.script.run
+                .withSuccessHandler(updateDashboardStats)
+                .withFailureHandler((error) => {
+                    console.error('Dashboard data loading failed:', error);
+                    // Show some default stats if the call fails
+                    updateDashboardStats({
+                        students: 0,
+                        courses: 0,
+                        enrollments: 0,
+                        assignments: 0
+                    });
+                })
+                .getDashboardStats();
+        }
+
+        function updateDashboardStats(stats) {
+            if (stats) {
+                document.getElementById('totalStudents').textContent = stats.students || 0;
+                document.getElementById('totalCourses').textContent = stats.courses || 0;
+                document.getElementById('totalEnrollments').textContent = stats.enrollments || 0;
+                document.getElementById('totalAssignments').textContent = stats.assignments || 0;
+            }
+        }
+
+        function loadContentData(contentId) {
+            switch(contentId) {
+                case 'students':
+                    loadStudents();
+                    break;
+                case 'courses':
+                    loadCourses();
+                    break;
+                case 'enrollments':
+                    loadEnrollments();
+                    break;
+                case 'assignments':
+                    loadAssignments();
+                    break;
+                case 'submissions':
+                    loadSubmissions();
+                    break;
+                case 'myCourses':
+                    loadMyCourses();
+                    break;
+                case 'myAssignments':
+                    loadMyAssignments();
+                    break;
+                case 'progress':
+                    loadProgress();
+                    break;
+            }
+        }
+
+        function loadStudents() {
+            // Check if Google Apps Script is available
+            if (typeof google === 'undefined' || !google.script) {
+                console.warn('Google Apps Script not available - showing demo students');
+                displayStudents([
+                    { id: 1, name: 'John Doe', username: 'john.doe', department: 'Computer Science' },
+                    { id: 2, name: 'Jane Smith', username: 'jane.smith', department: 'Mathematics' }
+                ]);
+                return;
+            }
+            
+            google.script.run
+                .withSuccessHandler(displayStudents)
+                .withFailureHandler((error) => {
+                    console.error('Loading students failed:', error);
+                    displayStudents([]);
+                })
+                .getAllStudents();
+        }
+
+        function displayStudents(students) {
+            const container = document.getElementById('studentsTable');
+            if (!students || students.length === 0) {
+                container.innerHTML = '<p>No students found.</p>';
+                return;
+            }
+
+            const table = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Username</th>
+                            <th>Department</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${students.map(student => `
+                            <tr>
+                                <td>${student.id}</td>
+                                <td>${student.name}</td>
+                                <td>${student.username}</td>
+                                <td>${student.department}</td>
+                                <td>
+                                    <button class="btn btn-secondary" onclick="viewStudent(${student.id})">View</button>
+                                    <button class="btn btn-danger" onclick="deleteStudent(${student.id})">Delete</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            container.innerHTML = table;
+        }
+
+        function loadCourses() {
+            // Check if Google Apps Script is available
+            if (typeof google === 'undefined' || !google.script) {
+                console.warn('Google Apps Script not available - showing demo courses');
+                displayCourses([
+                    { id: 1, name: 'Introduction to Programming', description: 'Learn the basics of programming with Python' },
+                    { id: 2, name: 'Data Structures', description: 'Understanding fundamental data structures and algorithms' }
+                ]);
+                return;
+            }
+            
+            google.script.run
+                .withSuccessHandler(displayCourses)
+                .withFailureHandler((error) => {
+                    console.error('Loading courses failed:', error);
+                    displayCourses([]);
+                })
+                .getAllCourses();
+        }
+
+        function displayCourses(courses) {
+            const container = document.getElementById('coursesTable');
+            if (!courses || courses.length === 0) {
+                container.innerHTML = '<p>No courses found.</p>';
+                return;
+            }
+
+            const table = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${courses.map(course => `
+                            <tr>
+                                <td>${course.id}</td>
+                                <td>${course.name}</td>
+                                <td>${course.description}</td>
+                                <td>
+                                    <button class="btn btn-secondary" onclick="viewCourse(${course.id})">View</button>
+                                    <button class="btn btn-danger" onclick="deleteCourse(${course.id})">Delete</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            container.innerHTML = table;
+        }
+
+        function loadEnrollments() {
+            google.script.run
+                .withSuccessHandler(displayEnrollments)
+                .withFailureHandler(onError)
+                .getAllEnrollments();
+        }
+
+        function displayEnrollments(enrollments) {
+            const container = document.getElementById('enrollmentsTable');
+            if (!enrollments || enrollments.length === 0) {
+                container.innerHTML = '<p>No enrollments found.</p>';
+                return;
+            }
+
+            const table = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Course</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${enrollments.map(enrollment => `
+                            <tr>
+                                <td>${enrollment.studentName}</td>
+                                <td>${enrollment.courseName}</td>
+                                <td><span class="status-badge status-${enrollment.status.toLowerCase()}">${enrollment.status}</span></td>
+                                <td>
+                                    <button class="btn btn-secondary" onclick="updateEnrollmentStatus(${enrollment.studentId}, ${enrollment.courseId})">Update Status</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            container.innerHTML = table;
+        }
+
+        function loadAssignments() {
+            google.script.run
+                .withSuccessHandler(displayAssignments)
+                .withFailureHandler(onError)
+                .getAllAssignments();
+        }
+
+        function displayAssignments(assignments) {
+            const container = document.getElementById('assignmentsTable');
+            if (!assignments || assignments.length === 0) {
+                container.innerHTML = '<p>No assignments found.</p>';
+                return;
+            }
+
+            const table = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Course</th>
+                            <th>Title</th>
+                            <th>Due Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${assignments.map(assignment => `
+                            <tr>
+                                <td>${assignment.id}</td>
+                                <td>${assignment.courseName}</td>
+                                <td>${assignment.title}</td>
+                                <td>${new Date(assignment.dueDate).toLocaleDateString()}</td>
+                                <td>
+                                    <button class="btn btn-secondary" onclick="viewAssignment(${assignment.id})">View</button>
+                                    <button class="btn btn-danger" onclick="deleteAssignment(${assignment.id})">Delete</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            container.innerHTML = table;
+        }
+
+        function loadSubmissions() {
+            google.script.run
+                .withSuccessHandler(displaySubmissions)
+                .withFailureHandler(onError)
+                .getAllSubmissions();
+        }
+
+        function displaySubmissions(submissions) {
+            const container = document.getElementById('submissionsTable');
+            if (!submissions || submissions.length === 0) {
+                container.innerHTML = '<p>No submissions found.</p>';
+                return;
+            }
+
+            const table = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Assignment</th>
+                            <th>Student</th>
+                            <th>Submission Date</th>
+                            <th>Grade</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${submissions.map(submission => `
+                            <tr>
+                                <td>${submission.id}</td>
+                                <td>${submission.assignmentTitle}</td>
+                                <td>${submission.studentName}</td>
+                                <td>${new Date(submission.submissionDate).toLocaleDateString()}</td>
+                                <td>${submission.grade || 'Not Graded'}</td>
+                                <td>
+                                    <button class="btn btn-secondary" onclick="gradeSubmission(${submission.id})">Grade</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            container.innerHTML = table;
+        }
+
+        function loadMyCourses() {
+            if (!currentUser) return;
+            
+            google.script.run
+                .withSuccessHandler(displayMyCourses)
+                .withFailureHandler(onError)
+                .getStudentCourses(currentUser.id);
+        }
+
+        function displayMyCourses(courses) {
+            const container = document.getElementById('myCoursesGrid');
+            if (!courses || courses.length === 0) {
+                container.innerHTML = '<p>You are not enrolled in any courses.</p>';
+                return;
+            }
+
+            const coursesHtml = courses.map(course => `
+                <div class="card">
+                    <h4>${course.name}</h4>
+                    <p>${course.description}</p>
+                    <p><strong>Status:</strong> <span class="status-badge status-${course.status.toLowerCase()}">${course.status}</span></p>
+                    <button class="btn" onclick="viewCourseDetails(${course.id})">View Details</button>
+                </div>
+            `).join('');
+
+            container.innerHTML = coursesHtml;
+        }
+
+        function loadMyAssignments() {
+            if (!currentUser) return;
+            
+            google.script.run
+                .withSuccessHandler(displayMyAssignments)
+                .withFailureHandler(onError)
+                .getStudentAssignments(currentUser.id);
+        }
+
+        function displayMyAssignments(assignments) {
+            const container = document.getElementById('myAssignmentsTable');
+            if (!assignments || assignments.length === 0) {
+                container.innerHTML = '<p>No assignments found.</p>';
+                return;
+            }
+
+            const table = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Course</th>
+                            <th>Title</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th>Grade</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${assignments.map(assignment => `
+                            <tr>
+                                <td>${assignment.courseName}</td>
+                                <td>${assignment.title}</td>
+                                <td>${new Date(assignment.dueDate).toLocaleDateString()}</td>
+                                <td>${assignment.submitted ? 'Submitted' : 'Pending'}</td>
+                                <td>${assignment.grade || 'Not Graded'}</td>
+                                <td>
+                                    ${!assignment.submitted ? 
+                                        `<button class="btn" onclick="showSubmitAssignmentModal(${assignment.id})">Submit</button>` :
+                                        `<button class="btn btn-secondary" onclick="viewSubmission(${assignment.id})">View Submission</button>`
+                                    }
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            container.innerHTML = table;
+        }
+
+        function loadProgress() {
+            if (userRole === 'student') {
+                google.script.run
+                    .withSuccessHandler(displayStudentProgress)
+                    .withFailureHandler(onError)
+                    .getStudentProgress(currentUser.id);
+            } else {
+                google.script.run
+                    .withSuccessHandler(displayAllProgress)
+                    .withFailureHandler(onError)
+                    .getAllProgress();
+            }
+        }
+
+        function displayStudentProgress(progress) {
+            const container = document.getElementById('progressData');
+            if (!progress) {
+                container.innerHTML = '<p>No progress data available.</p>';
+                return;
+            }
+
+            const progressHtml = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">${progress.coursesEnrolled}</div>
+                        <div class="stat-label">Courses Enrolled</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${progress.coursesCompleted}</div>
+                        <div class="stat-label">Courses Completed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${progress.assignmentsSubmitted}</div>
+                        <div class="stat-label">Assignments Submitted</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${progress.averageGrade || 'N/A'}</div>
+                        <div class="stat-label">Average Grade</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Course Progress</h3>
+                    ${progress.courseProgress ? progress.courseProgress.map(course => `
+                        <div style="margin-bottom: 15px;">
+                            <h4>${course.name}</h4>
+                            <div style="background: #f0f0f0; border-radius: 10px; height: 20px; position: relative;">
+                                <div style="background: #667eea; height: 100%; border-radius: 10px; width: ${course.progress}%;"></div>
+                                <span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12px; font-weight: bold;">${course.progress}%</span>
+                            </div>
+                        </div>
+                    `).join('') : '<p>No course progress data available.</p>'}
+                </div>
+            `;
+            container.innerHTML = progressHtml;
+        }
+
+        // Modal Functions
+        function showAddStudentModal() {
+            document.getElementById('addStudentModal').style.display = 'block';
+        }
+
+        function showAddCourseModal() {
+            document.getElementById('addCourseModal').style.display = 'block';
+        }
+
+        function showEnrollStudentModal() {
+            // Load students and courses for dropdowns
+            Promise.all([
+                new Promise(resolve => google.script.run.withSuccessHandler(resolve).getAllStudents()),
+                new Promise(resolve => google.script.run.withSuccessHandler(resolve).getAllCourses())
+            ]).then(([students, courses]) => {
+                populateSelect('enrollStudentSelect', students, 'id', 'name');
+                populateSelect('enrollCourseSelect', courses, 'id', 'name');
+                document.getElementById('enrollStudentModal').style.display = 'block';
+            });
+        }
+
+        function showAddAssignmentModal() {
+            google.script.run
+                .withSuccessHandler(courses => {
+                    populateSelect('assignmentCourse', courses, 'id', 'name');
+                    document.getElementById('addAssignmentModal').style.display = 'block';
+                })
+                .getAllCourses();
+        }
+
+        function showSubmitAssignmentModal(assignmentId) {
+            google.script.run
+                .withSuccessHandler(assignment => {
+                    document.getElementById('assignmentDetails').innerHTML = `
+                        <h4>${assignment.title}</h4>
+                        <p>${assignment.description}</p>
+                        <p><strong>Due Date:</strong> ${new Date(assignment.dueDate).toLocaleString()}</p>
+                        <input type="hidden" id="submissionAssignmentId" value="${assignment.id}">
+                    `;
+                    document.getElementById('submitAssignmentModal').style.display = 'block';
+                })
+                .getAssignment(assignmentId);
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function populateSelect(selectId, items, valueField, textField) {
+            const select = document.getElementById(selectId);
+            select.innerHTML = '<option value="">Select an option...</option>';
+            items.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item[valueField];
+                option.textContent = item[textField];
+                select.appendChild(option);
+            });
+        }
+
+        // Form Handlers
+        document.getElementById('addStudentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = {
+                name: document.getElementById('studentName').value,
+                username: document.getElementById('studentUsername').value,
+                password: document.getElementById('studentPassword').value,
+                department: document.getElementById('studentDepartment').value
+            };
+
+            google.script.run
+                .withSuccessHandler(result => {
+                    if (result.success) {
+                        closeModal('addStudentModal');
+                        loadStudents();
+                        showAlert('studentsContent', 'Student added successfully!', 'success');
+                        document.getElementById('addStudentForm').reset();
+                    } else {
+                        showAlert('studentsContent', result.message, 'error');
+                    }
+                })
+                .withFailureHandler(onError)
+                .addStudent(formData);
+        });
+
+        document.getElementById('addCourseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = {
+                name: document.getElementById('courseName').value,
+                description: document.getElementById('courseDescription').value
+            };
+
+            google.script.run
+                .withSuccessHandler(result => {
+                    if (result.success) {
+                        closeModal('addCourseModal');
+                        loadCourses();
+                        showAlert('coursesContent', 'Course added successfully!', 'success');
+                        document.getElementById('addCourseForm').reset();
+                    } else {
+                        showAlert('coursesContent', result.message, 'error');
+                    }
+                })
+                .withFailureHandler(onError)
+                .addCourse(formData);
+        });
+
+        document.getElementById('enrollStudentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = {
+                studentId: document.getElementById('enrollStudentSelect').value,
+                courseId: document.getElementById('enrollCourseSelect').value,
+                status: document.getElementById('enrollmentStatus').value
+            };
+
+            google.script.run
+                .withSuccessHandler(result => {
+                    if (result.success) {
+                        closeModal('enrollStudentModal');
+                        loadEnrollments();
+                        showAlert('enrollmentsContent', 'Student enrolled successfully!', 'success');
+                        document.getElementById('enrollStudentForm').reset();
+                    } else {
+                        showAlert('enrollmentsContent', result.message, 'error');
+                    }
+                })
+                .withFailureHandler(onError)
+                .enrollStudent(formData);
+        });
+
+        document.getElementById('addAssignmentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = {
+                courseId: document.getElementById('assignmentCourse').value,
+                title: document.getElementById('assignmentTitle').value,
+                description: document.getElementById('assignmentDescription').value,
+                dueDate: document.getElementById('assignmentDueDate').value
+            };
+
+            google.script.run
+                .withSuccessHandler(result => {
+                    if (result.success) {
+                        closeModal('addAssignmentModal');
+                        loadAssignments();
+                        showAlert('assignmentsContent', 'Assignment added successfully!', 'success');
+                        document.getElementById('addAssignmentForm').reset();
+                    } else {
+                        showAlert('assignmentsContent', result.message, 'error');
+                    }
+                })
+                .withFailureHandler(onError)
+                .addAssignment(formData);
+        });
+
+        document.getElementById('submitAssignmentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = {
+                assignmentId: document.getElementById('submissionAssignmentId').value,
+                studentId: currentUser.id,
+                submissionText: document.getElementById('submissionText').value
+            };
+
+            google.script.run
+                .withSuccessHandler(result => {
+                    if (result.success) {
+                        closeModal('submitAssignmentModal');
+                        loadMyAssignments();
+                        showAlert('myAssignmentsContent', 'Assignment submitted successfully!', 'success');
+                        document.getElementById('submitAssignmentForm').reset();
+                    } else {
+                        showAlert('myAssignmentsContent', result.message, 'error');
+                    }
+                })
+                .withFailureHandler(onError)
+                .submitAssignment(formData);
+        });
+
+        // Utility Functions
+        function showAlert(containerId, message, type) {
+            const container = document.getElementById(containerId);
+            const alertClass = type === 'error' ? 'alert-error' : 'alert-success';
+            const alertHtml = `<div class="alert ${alertClass}">${message}</div>`;
+            
+            if (container) {
+                container.insertAdjacentHTML('afterbegin', alertHtml);
+                setTimeout(() => {
+                    const alert = container.querySelector('.alert');
+                    if (alert) alert.remove();
+                }, 5000);
+            }
+        }
+
+        function onError(error) {
+            console.error('Error:', error);
+            alert('An error occurred: ' + error);
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html> 
